@@ -1,23 +1,27 @@
 {
     "port": 1337,
     "security": {
-        "tokenLife" : 3600
+        "tokenLife" : 999999999999999999999999999999999999999999
     },
     "mongoose": {
-        "uri": "mongodb://localhost/apiDB"
+        "uri": "mongodb://localhost/catchit-api"
     },
     "default": {
         "api": {
             "version" : "v1"
         },
         "user": {
-            "username": "myapi",
-            "password": "abc1234"
+            "username": "admin",
+            "first_name": "Admin",
+            "last_name": "User",
+            "email":  "test@admin.com",
+            "password": "password",
+            "verified": true
         },
         "client": {
-            "name": "Android API v1",
-            "clientId": "android",
-            "clientSecret": "SomeRandomCharsAndNumbers"
+            "name": "React Client",
+            "clientId": "react",
+            "clientSecret": "randomreactsecret"
         }
     }
 }

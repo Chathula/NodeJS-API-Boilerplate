@@ -12,14 +12,18 @@ var AccessToken = require(libs + 'model/accessToken');
 var RefreshToken = require(libs + 'model/refreshToken');
 
 User.remove({}, function(err) {
-    var user = new User({ 
-        username: config.get("default:user:username"), 
-        password: config.get("default:user:password") 
+    var user = new User({
+        username: config.get("default:user:username"),
+        first_name: config.get("default:user:first_name"),
+        last_name: config.get("default:user:last_name"),
+        email: config.get("default:user:email"),
+        password: config.get("default:user:password"),
+        verified: config.get("default:user:verified")
     });
-    
+
     user.save(function(err, user) {
         if(!err) {
-            log.info("New user - %s:%s", user.username, user.password);
+            log.info("New user - %s:%s", user.username, config.get("default:user:password"));
         }else {
             return log.error(err);
         }
@@ -27,12 +31,12 @@ User.remove({}, function(err) {
 });
 
 Client.remove({}, function(err) {
-    var client = new Client({ 
-        name: config.get("default:client:name"), 
-        clientId: config.get("default:client:clientId"), 
-        clientSecret: config.get("default:client:clientSecret") 
+    var client = new Client({
+        name: config.get("default:client:name"),
+        clientId: config.get("default:client:clientId"),
+        clientSecret: config.get("default:client:clientSecret")
     });
-    
+
     client.save(function(err, client) {
 
         if(!err) {

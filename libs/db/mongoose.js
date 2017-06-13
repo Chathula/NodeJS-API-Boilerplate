@@ -5,6 +5,7 @@ var libs = process.cwd() + '/libs/';
 var log = require(libs + 'log')(module);
 var config = require(libs + 'config');
 
+mongoose.Promise = global.Promise;
 mongoose.connect(config.get('mongoose:uri'));
 
 var db = mongoose.connection;

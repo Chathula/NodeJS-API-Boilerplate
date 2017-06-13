@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
-	crypto = require('crypto'),
+	bcrypt = require('bcrypt'),
+  saltRounds = 10,
 
 	Schema = mongoose.Schema,
 
@@ -9,42 +10,60 @@ var mongoose = require('mongoose'),
 			unique: true,
 			required: true
 		},
-		hashedPassword: {
+    first_name: {
+      type: String,
+      required: true
+    },
+    last_name: {
+      type: String,
+      required: true
+    },
+    email: {
+			type: String,
+      lowercase: true,
+      required: true,
+      unique: true,
+      validate: function(email) {
+        return /^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)
+      }
+		},
+		password: {
 			type: String,
 			required: true
 		},
-		salt: {
-			type: String,
-			required: true
-		},
+    verified: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
 		created: {
 			type: Date,
 			default: Date.now
 		}
 	});
 
-User.methods.encryptPassword = function(password) {
-	return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
-    //more secure - return crypto.pbkdf2Sync(password, this.salt, 10000, 512).toString('hex');
-};
+
+User.pre('save', function(next) {
+    var user = this;
+
+    // only hash the password if it has been modified (or is new)
+    if (!user.isModified('password')) return next();
+
+    bcrypt.hash(user.password, saltRounds, function(err, hash) {
+      user.password = hash;
+      next();
+    });
+
+});
 
 User.virtual('userId')
 .get(function () {
 	return this.id;
 });
 
-User.virtual('password')
-	.set(function(password) {
-		this._plainPassword = password;
-		this.salt = crypto.randomBytes(32).toString('hex');
-		        //more secure - this.salt = crypto.randomBytes(128).toString('hex');
-		        this.hashedPassword = this.encryptPassword(password);
-		    })
-	.get(function() { return this._plainPassword; });
-
 
 User.methods.checkPassword = function(password) {
-	return this.encryptPassword(password) === this.hashedPassword;
+  return bcrypt.compareSync(password, this.password); // true
 };
 
 module.exports = mongoose.model('User', User);
